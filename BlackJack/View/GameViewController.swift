@@ -44,12 +44,28 @@ class GameViewController: UIViewController {
                 self.dealerHand = self.gameVM.dealersHand
                 self.playerHand = self.gameVM.playersHand
                 
-                self.updateViews()
+                self.updateDealersStackView()
+                self.updatePlayersStackView()
             }
         }
     }
     
-    private func updateViews() {
+    
+    private func updatePlayersStackView() {
+        handStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
+        for card in playerHand {
+            let cardImageView = UIImageView()
+            cardImageView.load(url: URL(string: card.image)!)
+    
+            addCardToStackView(deckName: "player", cardImageView)
+        }
+        
+        yourHandValueLabel.text = "\(gameVM.playersHandValue)"
+    }
+    
+
+    private func updateDealersStackView() {
 
         dealersHandStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
@@ -67,23 +83,7 @@ class GameViewController: UIViewController {
             addCardToStackView(deckName: "dealer", cardImageView)
         }
         
-        
-        
-        //Dublicate olmamasi icin handStack in
-        handStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        
-        for card in playerHand {
-            let cardImageView = UIImageView()
-            cardImageView.load(url: URL(string: card.image)!)
-    
-            addCardToStackView(deckName: "player", cardImageView)
-        }
-        
-        
-        
         dealersHandValueLabel.text = "\(gameVM.dealersHandValue)"
-        yourHandValueLabel.text = "\(gameVM.playersHandValue)"
-        
         
     }
     
@@ -98,7 +98,7 @@ class GameViewController: UIViewController {
                     self.showTheAlert(title: "Lose", message: "You lose.")
                 }
                 
-                self.updateViews()
+                self.updatePlayersStackView()
                 
             }
         }
@@ -112,7 +112,7 @@ class GameViewController: UIViewController {
         gameVM.calculateDealersHandValueAfterStandPressed()
         var dealersHandValue = gameVM.dealersHandValue
         
-        updateViews()
+        updateDealersStackView()
             
         
         while dealersHandValue < 16 {
@@ -126,7 +126,7 @@ class GameViewController: UIViewController {
             dealersHandValue = self.gameVM.dealersHandValue
             dealerHand = gameVM.dealersHand
 
-            }
+        }
             
         self.gameVM.checkTheSituation()
     
@@ -136,7 +136,7 @@ class GameViewController: UIViewController {
             showTheAlert(title: "Lose", message: "You lose.")
         }
         
-        self.updateViews()
+        updateDealersStackView()
 
         
     }
@@ -170,7 +170,8 @@ class GameViewController: UIViewController {
             
             self.standPressed = false
             
-            self.updateViews()
+            self.updateDealersStackView()
+            self.updatePlayersStackView()
         }
         alert.addAction(action)
         present(alert, animated: true)
