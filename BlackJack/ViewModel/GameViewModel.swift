@@ -79,14 +79,16 @@ class GameViewModel {
         }
     }
     
-    func getCardForDealer() {
+    func getCardForDealer(completion: @escaping() -> Void) {
         APIService().getCard(numberOfCards: 1) { result in
             switch result {
             case .success(let cards):
                 let card = cards[0]
                 
                 self.dealersHand.append(card)
-                   
+                self.dealersHandValue += Int(cards[0].value) ?? 10
+                
+                completion()
             case.failure(_):
                 print("e")
             }

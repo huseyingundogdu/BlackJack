@@ -104,41 +104,36 @@ class GameViewController: UIViewController {
         }
     }
     
-    //Buraya iyilestirme yapilabilir sanirim ?
     @IBAction func standButtonPressed(_ sender: Any) {
         standPressed = true
         
-
         gameVM.calculateDealersHandValueAfterStandPressed()
         var dealersHandValue = gameVM.dealersHandValue
         
         updateDealersStackView()
-            
         
-        while dealersHandValue < 16 {
-            
-            
-            do {
-                gameVM.getCardForDealer()
-                sleep(1)
+        func getCardToDealer() {
+            if dealersHandValue < 16 {
+                gameVM.getCardForDealer {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        
+                        dealersHandValue = self.gameVM.dealersHandValue
+                        self.dealerHand = self.gameVM.dealersHand
+                        self.updateDealersStackView()
+                        getCardToDealer()
+                    }
+                }
+            } else {
+                self.gameVM.checkTheSituation()
+                
+                if self.gameVM.didPlayerWin {
+                    self.showTheAlert(title: "Win", message: "You win.")
+                } else {
+                    self.showTheAlert(title: "Lose", message: "You lose.")
+                }
             }
-            gameVM.calculateDealersHandValueAfterStandPressed()
-            dealersHandValue = self.gameVM.dealersHandValue
-            dealerHand = gameVM.dealersHand
-
         }
-            
-        self.gameVM.checkTheSituation()
-    
-        if gameVM.didPlayerWin {
-            showTheAlert(title: "Win", message: "You win.")
-        } else {
-            showTheAlert(title: "Lose", message: "You lose.")
-        }
-        
-        updateDealersStackView()
-
-        
+        getCardToDealer()
     }
     
     
